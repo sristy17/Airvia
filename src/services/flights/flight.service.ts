@@ -1,5 +1,5 @@
-import { createFlight } from "../repositories/flight.repository.js";
-import { CreateFlightDTO, Flight } from "../types/flight.types.js";
+import { createFlight } from "../../repositories/flight.repository.js";
+import { CreateFlightDTO, Flight } from "./dto/flight.dto.js";
 
 export const createFlightService = async (
   data: CreateFlightDTO

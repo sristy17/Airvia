@@ -5,7 +5,6 @@ export interface Flight {
   departure_time: Date;
   total_seats: number;
 }
-
 export interface CreateFlightDTO {
   airline: string;
   arrival_time: Date;

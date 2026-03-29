@@ -1,5 +1,5 @@
 import pool from "../config/db.js";
-import { CreateFlightDTO, Flight } from "../types/flight.types.js";
+import { CreateFlightDTO, Flight } from "../services/flights/dto/flight.dto.js";
 
 export const createFlight = async (data: CreateFlightDTO): Promise<Flight> => {
   const query = `
