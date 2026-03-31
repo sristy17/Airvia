@@ -19,3 +19,7 @@ export interface UpdateFlightDTO {
   departure_time?: Date;
   total_seats?: number;
 }
+
+export interface DeleteFlightDTO {
+  id: number;
+}

@@ -1,5 +1,5 @@
-import { createFlight, updateFlight } from "../../repositories/flight.repository.js";
-import { CreateFlightDTO, Flight, UpdateFlightDTO } from "./dto/flight.dto.js";
+import { createFlight, updateFlight, deleteFlight } from "../../repositories/flight.repository.js";
+import { CreateFlightDTO, Flight, UpdateFlightDTO, DeleteFlightDTO } from "./dto/flight.dto.js";
 
 export const createFlightService = async (
   data: CreateFlightDTO
@@ -51,4 +51,22 @@ export const updateFlightService = async (
   }
 
   return updatedFlight;
+};
+
+export const deleteFlightService = async (
+  data: DeleteFlightDTO
+): Promise<Flight> => {
+  const { id } = data;
+
+  if (!id) {
+    throw new Error("Flight ID is required");
+  }
+
+  const deletedFlight = await deleteFlight(data);
+
+  if (!deletedFlight) {
+    throw new Error("Flight not found");
+  }
+
+  return deletedFlight;
 };

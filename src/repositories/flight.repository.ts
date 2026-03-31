@@ -1,5 +1,5 @@
 import { pool } from "../config/db.js";
-import { CreateFlightDTO, Flight, UpdateFlightDTO } from "../services/flights/dto/flight.dto.js";
+import { CreateFlightDTO, Flight, UpdateFlightDTO, DeleteFlightDTO } from "../services/flights/dto/flight.dto.js";
 
 export const createFlight = async (data: CreateFlightDTO): Promise<Flight> => {
   const query = `
@@ -48,5 +48,18 @@ export const updateFlight = async (
   values.push(flightId);
 
   const result = await pool.query(query, values);
+  return result.rows[0];
+};
+
+export const deleteFlight = async (
+  data: DeleteFlightDTO
+) => {
+  const query = `
+    DELETE FROM flights
+    WHERE flight_id = $1
+    RETURNING *;
+  `;
+
+  const result = await pool.query(query, [data.id]);
   return result.rows[0];
 };
