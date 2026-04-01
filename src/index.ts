@@ -1,5 +1,6 @@
 import express from "express";
 import flightRoutes from "../src/routes/flight.route.js";
+import customerRoutes from "../src/routes/customer.route.js";
 
 const app = express();
 const PORT = 3000;
@@ -11,6 +12,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/", flightRoutes);
+app.use("/", customerRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
