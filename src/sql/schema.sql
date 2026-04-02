@@ -3,7 +3,11 @@ CREATE TABLE flights (
     airline VARCHAR(200) NOT NULL,
     arrival_time TIMESTAMP NOT NULL,
     departure_time TIMESTAMP NOT NULL,
-    total_seats INT NOT NULL
+    
+    total_seats INT NOT NULL,
+    available_seats INT NOT NULL,
+
+    CONSTRAINT chk_seats CHECK (available_seats <= total_seats)
 );
 
 CREATE TABLE customers (
@@ -21,29 +25,32 @@ CREATE TABLE bookings (
     booking_id SERIAL PRIMARY KEY,
     flight_id INT REFERENCES flights(flight_id) ON DELETE CASCADE,
     customer_id INT REFERENCES customers(customer_id) ON DELETE CASCADE,
+
+    seat_number VARCHAR(10),
+
     booking_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     status VARCHAR(20) NOT NULL,
     
     CONSTRAINT chk_status
-    CHECK (status IN ('CONFIRMED', 'CANCELLED', 'PENDING'))
+    CHECK (status IN ('CONFIRMED', 'CANCELLED', 'PENDING', 'COMPLETED'))
 );
 
 CREATE INDEX idx_booking_status
 ON bookings(status);
 
-CREATE TABLE seat_layouts (
-    seat_number VARCHAR(10) PRIMARY KEY,
-    class VARCHAR(50) NOT NULL
-);
-
-
-CREATE TABLE booked_seats (
+CREATE TABLE flight_seats (
+    id SERIAL PRIMARY KEY,
     flight_id INT REFERENCES flights(flight_id) ON DELETE CASCADE,
-    seat_number VARCHAR(10) REFERENCES seat_layouts(seat_number),
-    booking_id INT REFERENCES bookings(booking_id) ON DELETE CASCADE,
-    
-    PRIMARY KEY (flight_id, seat_number)
+
+    seat_number VARCHAR(10),
+    class VARCHAR(50),
+
+    is_booked BOOLEAN DEFAULT FALSE,
+
+    locked_until TIMESTAMP,
+
+    UNIQUE (flight_id, seat_number)
 );
 
-CREATE INDEX idx_flight_seat
-ON booked_seats(flight_id);
+CREATE INDEX idx_flight_seats_available
+ON flight_seats(flight_id, is_booked);
