@@ -1,9 +1,10 @@
-import { BOOKING_STATUS } from "../booking.types.js";
+import { BOOKING_STATUS } from "../../../core/enums.js";
 
 export interface Booking {
   booking_id: number;
   flight_id: number;
   customer_id: number;
+  seat_number: string;
   booking_date: Date;
   status: BOOKING_STATUS;
 }
@@ -11,9 +12,9 @@ export interface Booking {
 export interface CreateBookingDTO {
   flight_id: number;
   customer_id: number;
-  status: BOOKING_STATUS;
+  seat_number: string;
 }
 
-export interface UpdateBookingDTO {
-  status?: BOOKING_STATUS;
+export interface UpdateBookingStatusDTO {
+  status: BOOKING_STATUS;
 }

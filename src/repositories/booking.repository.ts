@@ -1,20 +1,31 @@
 import { pool } from "../config/db.js";
-import { CreateBookingDTO, UpdateBookingDTO } from "../services/bookings/dto/booking.dto.js";
+import { CreateBookingDTO } from "../services/bookings/dto/booking.dto.js";
 
-export const createBookingRepo = async (data: CreateBookingDTO) => {
+// CREATE
+export const createBooking = async (client: any, data: CreateBookingDTO) => {
   const query = `
-    INSERT INTO bookings (flight_id, customer_id, status)
-    VALUES ($1, $2, $3)
+    INSERT INTO bookings (flight_id, customer_id, seat_number, status)
+    VALUES ($1, $2, $3, 'CONFIRMED')
     RETURNING *;
   `;
 
-  const values = [data.flight_id, data.customer_id, data.status];
-  const result = await pool.query(query, values);
+  const result = await client.query(query, [
+    data.flight_id,
+    data.customer_id,
+    data.seat_number,
+  ]);
 
   return result.rows[0];
 };
 
-export const getBookingByIdRepo = async (id: number) => {
+// GET ALL
+export const getBookings = async () => {
+  const result = await pool.query(`SELECT * FROM bookings ORDER BY booking_id`);
+  return result.rows;
+};
+
+// GET BY ID
+export const getBookingById = async (id: number) => {
   const result = await pool.query(
     `SELECT * FROM bookings WHERE booking_id = $1`,
     [id]
@@ -22,32 +33,23 @@ export const getBookingByIdRepo = async (id: number) => {
   return result.rows[0];
 };
 
-export const getAllBookingsRepo = async () => {
-  const result = await pool.query(`SELECT * FROM bookings`);
-  return result.rows;
-};
-
-export const updateBookingRepo = async (
-  id: number,
-  data: UpdateBookingDTO
+// UPDATE STATUS
+export const updateBookingStatus = async (
+  bookingId: number,
+  status: string
 ) => {
-  const query = `
-    UPDATE bookings
-    SET status = COALESCE($1, status)
-    WHERE booking_id = $2
-    RETURNING *;
-  `;
-
-  const values = [data.status, id];
-  const result = await pool.query(query, values);
-
+  const result = await pool.query(
+    `UPDATE bookings SET status=$1 WHERE booking_id=$2 RETURNING *`,
+    [status, bookingId]
+  );
   return result.rows[0];
 };
 
-export const deleteBookingRepo = async (id: number) => {
+// DELETE
+export const deleteBooking = async (bookingId: number) => {
   const result = await pool.query(
-    `DELETE FROM bookings WHERE booking_id = $1 RETURNING *`,
-    [id]
+    `DELETE FROM bookings WHERE booking_id=$1 RETURNING *`,
+    [bookingId]
   );
   return result.rows[0];
 };

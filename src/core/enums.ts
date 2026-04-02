@@ -1,5 +1,12 @@
+export enum GENDER {
+  MALE = "M",
+  FEMALE = "F",
+  OTHER = "O"
+}
+
 export enum BOOKING_STATUS {
   CONFIRMED = "CONFIRMED",
   CANCELLED = "CANCELLED",
   PENDING = "PENDING",
+  COMPLETED = "COMPLETED"
 }

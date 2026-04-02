@@ -1,72 +1,90 @@
-import { createFlight, updateFlight, deleteFlight } from "../../repositories/flight.repository.js";
-import { CreateFlightDTO, Flight, UpdateFlightDTO, DeleteFlightDTO } from "./dto/flight.dto.js";
+import {
+  createFlight,
+  updateFlight,
+  deleteFlight,
+  getFlights,
+  getFlightById,
+} from "../../repositories/flight.repository.js";
 
+import {
+  CreateFlightDTO,
+  UpdateFlightDTO,
+  Flight,
+} from "./dto/flight.dto.js";
+
+import { trimString } from "../../core/utils/trim.js";
+
+// CREATE
 export const createFlightService = async (
   data: CreateFlightDTO
 ): Promise<Flight> => {
-  const { airline, arrival_time, departure_time, total_seats } = data;
-console.log(data);
-  if (!airline || !arrival_time || !departure_time || !total_seats) {
+  const airline = trimString(data.airline);
+
+  if (!airline || !data.arrival_time || !data.departure_time || !data.total_seats) {
     throw new Error("All fields are required");
   }
 
-  if (new Date(departure_time) >= new Date(arrival_time)) {
-    throw new Error("Departure time must be before arrival time");
+  if (new Date(data.departure_time) >= new Date(data.arrival_time)) {
+    throw new Error("Departure must be before arrival");
   }
 
-  if (total_seats <= 0) {
-    throw new Error("Total seats must be greater than 0");
+  if (data.total_seats <= 0) {
+    throw new Error("Seats must be greater than 0");
   }
 
-  const flight = await createFlight({
+  return await createFlight({
+    ...data,
     airline,
-    arrival_time,
-    departure_time,
-    total_seats,
   });
+};
+
+// GET ALL
+export const getFlightsService = async (): Promise<Flight[]> => {
+  return await getFlights();
+};
+
+// GET BY ID
+export const getFlightByIdService = async (id: number): Promise<Flight> => {
+  if (!id) throw new Error("Flight ID required");
+
+  const flight = await getFlightById(id);
+
+  if (!flight) throw new Error("Flight not found");
 
   return flight;
 };
 
-
+// UPDATE
 export const updateFlightService = async (
   flightId: number,
   data: UpdateFlightDTO
 ): Promise<Flight> => {
+  if (!flightId) throw new Error("Flight ID required");
 
-  if (!flightId) {
-    throw new Error("Flight ID is required");
+  if (data.airline) {
+    data.airline = trimString(data.airline);
   }
 
   if (data.departure_time && data.arrival_time) {
     if (new Date(data.departure_time) >= new Date(data.arrival_time)) {
-      throw new Error("Departure must be before arrival");
+      throw new Error("Invalid timing");
     }
   }
 
-  const updatedFlight = await updateFlight(flightId, data);
+  const updated = await updateFlight(flightId, data);
 
-  if (!updatedFlight) {
-    throw new Error("Flight not found");
-  }
+  if (!updated) throw new Error("Flight not found");
 
-  return updatedFlight;
+  return updated;
 };
 
-export const deleteFlightService = async (
-  data: DeleteFlightDTO
-): Promise<Flight> => {
-  const { id } = data;
+// DELETE
+export const deleteFlightService = async (flightId: number): Promise<Flight> => {
+  if (!flightId) throw new Error("Flight ID required");
 
-  if (!id) {
-    throw new Error("Flight ID is required");
-  }
+  const deleted = await deleteFlight(flightId);
 
-  const deletedFlight = await deleteFlight(data);
+  if (!deleted) throw new Error("Flight not found");
 
-  if (!deletedFlight) {
-    throw new Error("Flight not found");
-  }
-
-  return deletedFlight;
+  return deleted;
 };
