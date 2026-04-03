@@ -13,39 +13,76 @@ import {
 } from "./dto/flight.dto.js";
 
 import { trimString } from "../../core/utils/trim.js";
+import { pool } from "../../config/db.js";
 
-// CREATE
+// create
 export const createFlightService = async (
   data: CreateFlightDTO
 ): Promise<Flight> => {
-  const airline = trimString(data.airline);
 
-  if (!airline || !data.arrival_time || !data.departure_time || !data.total_seats) {
-    throw new Error("All fields are required");
+  const client = await pool.connect();
+
+  try {
+    // validations
+    if (!data.airline) throw new Error("Airline is required");
+
+    const airline = trimString(data.airline);
+
+    if (!data.arrival_time || !data.departure_time || !data.total_seats) {
+      throw new Error("All fields are required");
+    }
+
+    if (new Date(data.departure_time) >= new Date(data.arrival_time)) {
+      throw new Error("Departure must be before arrival");
+    }
+
+    if (data.total_seats <= 0) {
+      throw new Error("Seats must be greater than 0");
+    }
+
+    await client.query("BEGIN");
+
+    const flight = await createFlight(client, {
+      airline: data.airline,
+      arrival_time: data.arrival_time,
+      departure_time: data.departure_time,
+      total_seats: data.total_seats,
+    });
+
+    // auto-create seats
+    const values: string[] = [];
+
+    for (let i = 1; i <= data.total_seats; i++) {
+      values.push(`(${flight.flight_id}, 'A${i}', 'ECONOMY')`);
+    }
+
+    await client.query(`
+      INSERT INTO flight_seats (flight_id, seat_number, class)
+      VALUES ${values.join(",")}
+    `);
+
+    await client.query("COMMIT");
+
+    return flight;
+
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
   }
-
-  if (new Date(data.departure_time) >= new Date(data.arrival_time)) {
-    throw new Error("Departure must be before arrival");
-  }
-
-  if (data.total_seats <= 0) {
-    throw new Error("Seats must be greater than 0");
-  }
-
-  return await createFlight({
-    ...data,
-    airline,
-  });
 };
 
-// GET ALL
+// get all
 export const getFlightsService = async (): Promise<Flight[]> => {
   return await getFlights();
 };
 
-// GET BY ID
+// get by id
 export const getFlightByIdService = async (id: number): Promise<Flight> => {
-  if (!id) throw new Error("Flight ID required");
+  if (!id || isNaN(id)) {
+    throw new Error("Valid flight ID required");
+  }
 
   const flight = await getFlightById(id);
 
@@ -54,12 +91,15 @@ export const getFlightByIdService = async (id: number): Promise<Flight> => {
   return flight;
 };
 
-// UPDATE
+// update
 export const updateFlightService = async (
   flightId: number,
   data: UpdateFlightDTO
 ): Promise<Flight> => {
-  if (!flightId) throw new Error("Flight ID required");
+
+  if (!flightId || isNaN(flightId)) {
+    throw new Error("Valid flight ID required");
+  }
 
   if (data.airline) {
     data.airline = trimString(data.airline);
@@ -71,6 +111,20 @@ export const updateFlightService = async (
     }
   }
 
+  if (data.total_seats !== undefined) {
+    const booked = await pool.query(
+      `SELECT COUNT(*) FROM flight_seats
+       WHERE flight_id=$1 AND is_booked=true`,
+      [flightId]
+    );
+
+    const bookedCount = Number(booked.rows[0].count);
+
+    if (data.total_seats < bookedCount) {
+      throw new Error("Cannot reduce seats below booked seats");
+    }
+  }
+
   const updated = await updateFlight(flightId, data);
 
   if (!updated) throw new Error("Flight not found");
@@ -78,9 +132,14 @@ export const updateFlightService = async (
   return updated;
 };
 
-// DELETE
-export const deleteFlightService = async (flightId: number): Promise<Flight> => {
-  if (!flightId) throw new Error("Flight ID required");
+// delete
+export const deleteFlightService = async (
+  flightId: number
+): Promise<Flight> => {
+
+  if (!flightId || isNaN(flightId)) {
+    throw new Error("Valid flight ID required");
+  }
 
   const deleted = await deleteFlight(flightId);
 

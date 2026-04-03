@@ -1,21 +1,24 @@
 import { pool } from "../config/db.js";
 import { CreateFlightDTO, UpdateFlightDTO } from "../services/flights/dto/flight.dto.js";
+import { PoolClient } from "pg";
 
-// CREATE
-export const createFlight = async (data: CreateFlightDTO) => {
-  const query = `
-    INSERT INTO flights 
-    (airline, arrival_time, departure_time, total_seats, available_seats)
-    VALUES ($1, $2, $3, $4, $4)
-    RETURNING *;
-  `;
-
-  const result = await pool.query(query, [
-    data.airline,
-    data.arrival_time,
-    data.departure_time,
-    data.total_seats,
-  ]);
+// create
+export const createFlight = async (
+  client: PoolClient,
+  data: CreateFlightDTO
+) => {
+  const result = await client.query(
+    `INSERT INTO flights 
+     (airline, arrival_time, departure_time, total_seats, available_seats)
+     VALUES ($1,$2,$3,$4,$4)
+     RETURNING *`,
+    [
+      data.airline,
+      data.arrival_time,
+      data.departure_time,
+      data.total_seats,
+    ]
+  );
 
   return result.rows[0];
 };

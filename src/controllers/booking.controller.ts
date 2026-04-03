@@ -5,6 +5,7 @@ import {
   getBookingByIdService,
   updateBookingStatusService,
   deleteBookingService,
+  cancelBookingService
 } from "../services/bookings/booking.service.js";
 
 // CREATE
@@ -65,5 +66,18 @@ export const deleteBookingController = async (req: Request, res: Response) => {
     });
   } catch (err: any) {
     res.status(404).json({ error: err.message });
+  }
+};
+
+//cancel booking
+export const cancelBookingController = async (req:Request, res:Response) => {
+  try {
+    const id = Number(req.params.id);
+
+    const result = await cancelBookingService(id);
+
+    res.json(result);
+  } catch (err:any) {
+    res.status(400).json({ error: err.message });
   }
 };
