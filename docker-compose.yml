@@ -15,23 +15,6 @@ services:
       - airbnb_data:/var/lib/postgresql/data
       - ./src/sql:/docker-entrypoint-initdb.d 
 
-  backend:
-    build: .
-    container_name: airbnb-backend
-    restart: always
-    depends_on:
-      - postgres
-    environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: admin
-      DB_PASSWORD: admin
-      DB_NAME: airbnb
-    ports:
-      - "3000:3000"
-    volumes:
-      - .:/app
-    command: npm run dev
 
 volumes:
   airbnb_data:
