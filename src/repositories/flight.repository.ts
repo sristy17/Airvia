@@ -2,7 +2,6 @@ import { pool } from "../config/db.js";
 import { CreateFlightDTO, UpdateFlightDTO } from "../services/flights/dto/flight.dto.js";
 import { PoolClient } from "pg";
 
-// create
 export const createFlight = async (
   client: PoolClient,
   data: CreateFlightDTO
@@ -23,13 +22,30 @@ export const createFlight = async (
   return result.rows[0];
 };
 
-// GET ALL
+export const createFlightSeats = async (
+  client: PoolClient,
+  flightId: number,
+  totalSeats: number
+) => {
+  const values: string[] = [];
+
+  for (let i = 1; i <= totalSeats; i++) {
+    values.push(`(${flightId}, 'A${i}', 'ECONOMY')`);
+  }
+
+  await client.query(
+    `INSERT INTO flight_seats (flight_id, seat_number, class)
+     VALUES ${values.join(",")}`
+  );
+};
+
 export const getFlights = async () => {
-  const result = await pool.query(`SELECT * FROM flights ORDER BY flight_id`);
+  const result = await pool.query(
+    `SELECT * FROM flights ORDER BY flight_id`
+  );
   return result.rows;
 };
 
-// GET BY ID
 export const getFlightById = async (id: number) => {
   const result = await pool.query(
     `SELECT * FROM flights WHERE flight_id = $1`,
@@ -38,7 +54,16 @@ export const getFlightById = async (id: number) => {
   return result.rows[0];
 };
 
-// UPDATE
+export const getBookedSeatsCount = async (flightId: number) => {
+  const result = await pool.query(
+    `SELECT COUNT(*) FROM flight_seats
+     WHERE flight_id=$1 AND is_booked=true`,
+    [flightId]
+  );
+
+  return Number(result.rows[0].count);
+};
+
 export const updateFlight = async (
   flightId: number,
   data: UpdateFlightDTO
@@ -79,7 +104,6 @@ export const updateFlight = async (
   return result.rows[0];
 };
 
-// DELETE
 export const deleteFlight = async (flightId: number) => {
   const result = await pool.query(
     `DELETE FROM flights WHERE flight_id = $1 RETURNING *`,
