@@ -18,3 +18,9 @@ export interface CreateBookingDTO {
 export interface UpdateBookingStatusDTO {
   status: BOOKING_STATUS;
 }
+
+export interface CreateBookingJob {
+  flight_id: number;
+  customer_id: number;
+  seat_number: string;
+}
