@@ -15,11 +15,11 @@ services:
       - airbnb_data:/var/lib/postgresql/data
       - ./src/sql:/docker-entrypoint-initdb.d 
 
-  redis:
-    image: redis:7
-    container_name: redis-container
-    ports:
-      - "6379:6379"
+  # redis:
+  #   image: redis:7
+  #   container_name: redis-container
+  #   ports:
+  #     - "6379:6379"
 
 volumes:
   airbnb_data:

@@ -13,6 +13,7 @@ export interface CreateBookingDTO {
   flight_id: number;
   customer_id: number;
   seat_number: string;
+  status: BOOKING_STATUS;
 }
 
 export interface UpdateBookingStatusDTO {

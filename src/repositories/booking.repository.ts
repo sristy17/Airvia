@@ -5,7 +5,7 @@ import { getSeatForUpdate } from "./flightseat.repository.js";
 export const createBooking = async (client: any, data: CreateBookingDTO) => {
   const result = await client.query(
     `INSERT INTO bookings (flight_id, customer_id, seat_number, status)
-     VALUES ($1, $2, $3, 'CONFIRMED')
+     VALUES ($1, $2, $3, 'PENDING')
      RETURNING *`,
     [data.flight_id, data.customer_id, data.seat_number]
   );
@@ -63,23 +63,25 @@ export const cancelBookingTx = async (client: any, bookingId: number) => {
     throw new Error("Already cancelled");
   }
 
-  const seat = await getSeatForUpdate(
-    client,
-    booking.flight_id,
-    booking.seat_number
-  );
+  // Only release seat if one was assigned
+  if (booking.seat_number) {
+    const seat = await getSeatForUpdate(
+      client,
+      booking.flight_id,
+      booking.seat_number
+    );
 
-  if (!seat) {
-    throw new Error("Seat not found");
+    if (seat) {
+      await client.query(
+        `UPDATE flight_seats
+         SET is_booked=false, locked_until=NULL
+         WHERE id=$1`,
+        [seat.id]
+      );
+    }
   }
 
-  await client.query(
-    `UPDATE flight_seats
-     SET is_booked=false, locked_until=NULL
-     WHERE id=$1`,
-    [seat.id]
-  );
-
+  // Update booking status
   await client.query(
     `UPDATE bookings
      SET status='CANCELLED'
@@ -90,7 +92,7 @@ export const cancelBookingTx = async (client: any, bookingId: number) => {
   await client.query(
     `UPDATE flights
      SET available_seats = available_seats + 1
-     WHERE flight_id=$1`,
+     WHERE flight_id=$1 AND available_seats < total_seats`,
     [booking.flight_id]
   );
 

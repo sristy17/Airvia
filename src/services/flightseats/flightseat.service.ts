@@ -1,8 +1,5 @@
-import { pool } from "../../config/db.js";
-
 import {
-  getAvailableSeats,
-  createFlightSeats
+  getAvailableSeats
 } from "../../repositories/flightseat.repository.js";
 
 // GET AVAILABLE SEATS
