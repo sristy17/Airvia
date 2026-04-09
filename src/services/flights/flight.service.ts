@@ -17,6 +17,16 @@ import {
 import { trimString } from "../../core/utils/trim.js";
 import { pool } from "../../config/db.js";
 
+/**
+ * Create a new flight with seats
+ *
+ * Validates input, creates flight record, and generates seat entries
+ * within a database transaction.
+ *
+ * @param {CreateFlightDTO} data - Flight input data
+ * @returns {Promise<Flight>} Newly created flight
+ */
+
 export const createFlightService = async (
   data: CreateFlightDTO
 ): Promise<Flight> => {
@@ -61,9 +71,22 @@ export const createFlightService = async (
   }
 };
 
+/**
+ * Get all flights
+ *
+ * @returns {Promise<Flight[]>} List of flights
+ */
+
 export const getFlightsService = async (): Promise<Flight[]> => {
   return await getFlights();
 };
+
+/**
+ * Get a flight by ID
+ *
+ * @param {number} id - Flight ID
+ * @returns {Promise<Flight>} Flight record
+ */
 
 export const getFlightByIdService = async (id: number): Promise<Flight> => {
   if (!id || isNaN(id)) {
@@ -76,6 +99,16 @@ export const getFlightByIdService = async (id: number): Promise<Flight> => {
 
   return flight;
 };
+
+/**
+ * Update a flight (partial update supported)
+ *
+ * Validates input data and ensures seat constraints are maintained.
+ *
+ * @param {number} flightId - Flight ID
+ * @param {UpdateFlightDTO} data - Fields to update
+ * @returns {Promise<Flight>} Updated flight record
+ */
 
 export const updateFlightService = async (
   flightId: number,
@@ -109,6 +142,13 @@ export const updateFlightService = async (
 
   return updated;
 };
+
+/**
+ * Delete a flight
+ *
+ * @param {number} flightId - Flight ID
+ * @returns {Promise<Flight>} Deleted flight record
+ */
 
 export const deleteFlightService = async (
   flightId: number

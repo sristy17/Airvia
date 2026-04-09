@@ -2,6 +2,14 @@ import { pool } from "../config/db.js";
 import { CreateBookingDTO } from "../services/bookings/dto/booking.dto.js";
 import { getSeatForUpdate } from "./flightseat.repository.js";
 
+/**
+ * Creates a new booking within a transaction.
+ *
+ * @param {any} client - PostgreSQL client (transaction context)
+ * @param {CreateBookingDTO} data - Booking data
+ * @returns {Promise<any>} Newly created booking record
+ */
+
 export const createBooking = async (client: any, data: CreateBookingDTO) => {
   const result = await client.query(
     `INSERT INTO bookings (flight_id, customer_id, seat_number, status)
@@ -13,12 +21,25 @@ export const createBooking = async (client: any, data: CreateBookingDTO) => {
   return result.rows[0];
 };
 
+/**
+ * Fetch all bookings
+ *
+ * @returns {Promise<any[]>} List of bookings
+ */
+
 export const getBookings = async () => {
   const result = await pool.query(
     `SELECT * FROM bookings ORDER BY booking_id`
   );
   return result.rows;
 };
+
+/**
+ * Fetch a booking by ID
+ *
+ * @param {number} id - Booking ID
+ * @returns {Promise<any>} Booking record
+ */
 
 export const getBookingById = async (id: number) => {
   const result = await pool.query(
@@ -27,6 +48,14 @@ export const getBookingById = async (id: number) => {
   );
   return result.rows[0];
 };
+
+/**
+ * Update booking status
+ *
+ * @param {number} bookingId - Booking ID
+ * @param {string} status - New booking status
+ * @returns {Promise<any>} Updated booking record
+ */
 
 export const updateBookingStatus = async (
   bookingId: number,
@@ -39,6 +68,13 @@ export const updateBookingStatus = async (
   return result.rows[0];
 };
 
+/**
+ * Delete a booking
+ *
+ * @param {number} bookingId - Booking ID
+ * @returns {Promise<any>} Deleted booking record
+ */
+
 export const deleteBooking = async (bookingId: number) => {
   const result = await pool.query(
     `DELETE FROM bookings WHERE booking_id=$1 RETURNING *`,
@@ -46,6 +82,21 @@ export const deleteBooking = async (bookingId: number) => {
   );
   return result.rows[0];
 };
+
+/**
+ * Cancel a booking within a transaction.
+ *
+ * Steps:
+ * 1. Lock booking row (FOR UPDATE)
+ * 2. Validate booking existence and status
+ * 3. Release seat if assigned
+ * 4. Update booking status to CANCELLED
+ * 5. Increment available seats in flight
+ *
+ * @param {any} client - PostgreSQL client (transaction context)
+ * @param {number} bookingId - Booking ID
+ * @returns {Promise<{ message: string }>}
+ */
 
 export const cancelBookingTx = async (client: any, bookingId: number) => {
   const bookingRes = await client.query(
@@ -89,6 +140,7 @@ export const cancelBookingTx = async (client: any, bookingId: number) => {
     [bookingId]
   );
 
+  // Increment available seats safely
   await client.query(
     `UPDATE flights
      SET available_seats = available_seats + 1

@@ -2,6 +2,14 @@ import { pool } from "../config/db.js";
 import { CreateFlightDTO, UpdateFlightDTO } from "../services/flights/dto/flight.dto.js";
 import { PoolClient } from "pg";
 
+/**
+ * Create a new flight within a transaction
+ *
+ * @param {PoolClient} client - PostgreSQL transaction client
+ * @param {CreateFlightDTO} data - Flight data
+ * @returns {Promise<any>} Newly created flight record
+ */
+
 export const createFlight = async (
   client: PoolClient,
   data: CreateFlightDTO
@@ -22,6 +30,17 @@ export const createFlight = async (
   return result.rows[0];
 };
 
+/**
+ * Create seats for a flight
+ *
+ * Generates seat numbers (A1, A2, ..., A{n}) and assigns ECONOMY class.
+ *
+ * @param {PoolClient} client - PostgreSQL transaction client
+ * @param {number} flightId - Flight ID
+ * @param {number} totalSeats - Total number of seats
+ * @returns {Promise<void>}
+ */
+
 export const createFlightSeats = async (
   client: PoolClient,
   flightId: number,
@@ -39,12 +58,25 @@ export const createFlightSeats = async (
   );
 };
 
+/**
+ * Fetch all flights
+ *
+ * @returns {Promise<any[]>} List of flights
+ */
+
 export const getFlights = async () => {
   const result = await pool.query(
     `SELECT * FROM flights ORDER BY flight_id`
   );
   return result.rows;
 };
+
+/**
+ * Fetch a flight by ID
+ *
+ * @param {number} id - Flight ID
+ * @returns {Promise<any>} Flight record
+ */
 
 export const getFlightById = async (id: number) => {
   const result = await pool.query(
@@ -53,6 +85,13 @@ export const getFlightById = async (id: number) => {
   );
   return result.rows[0];
 };
+
+/**
+ * Get count of booked seats for a flight
+ *
+ * @param {number} flightId - Flight ID
+ * @returns {Promise<number>} Number of booked seats
+ */
 
 export const getBookedSeatsCount = async (flightId: number) => {
   const result = await pool.query(
@@ -63,6 +102,14 @@ export const getBookedSeatsCount = async (flightId: number) => {
 
   return Number(result.rows[0].count);
 };
+
+/**
+ * Update flight details (partial update supported)
+ *
+ * @param {number} flightId - Flight ID
+ * @param {UpdateFlightDTO} data - Fields to update
+ * @returns {Promise<any>} Updated flight record
+ */
 
 export const updateFlight = async (
   flightId: number,
@@ -103,6 +150,13 @@ export const updateFlight = async (
   const result = await pool.query(query, values);
   return result.rows[0];
 };
+
+/**
+ * Delete a flight
+ *
+ * @param {number} flightId - Flight ID
+ * @returns {Promise<any>} Deleted flight record
+ */
 
 export const deleteFlight = async (flightId: number) => {
   const result = await pool.query(

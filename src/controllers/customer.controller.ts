@@ -7,7 +7,15 @@ import {
   getCustomerByIdService,
 } from "../services/customers/customer.service.js";
 
-// CREATE
+/**
+ * Create a new customer
+ *
+ * @route POST /customers
+ * @param {Request} req - Express request object (expects customer data in body)
+ * @param {Response} res - Express response object
+ * @returns {Promise<void>}
+ */
+
 export const createCustomerController = async (req: Request, res: Response) => {
   try {
     const customer = await createCustomerService(req.body);
@@ -17,7 +25,15 @@ export const createCustomerController = async (req: Request, res: Response) => {
   }
 };
 
-// GET ALL
+/**
+ * Get all customers
+ *
+ * @route GET /customers
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ * @returns {Promise<void>}
+ */
+
 export const getCustomersController = async (req: Request, res: Response) => {
   try {
     const customers = await getCustomersService();
@@ -27,7 +43,15 @@ export const getCustomersController = async (req: Request, res: Response) => {
   }
 };
 
-// GET BY ID
+/**
+ * Get a customer by ID
+ *
+ * @route GET /customers/:id
+ * @param {Request} req - Express request object (expects customer ID in params)
+ * @param {Response} res - Express response object
+ * @returns {Promise<void>}
+ */
+
 export const getCustomerByIdController = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
@@ -38,7 +62,15 @@ export const getCustomerByIdController = async (req: Request, res: Response) => 
   }
 };
 
-// UPDATE
+/**
+ * Update a customer
+ *
+ * @route PUT /customers/:id
+ * @param {Request} req - Express request object (expects customer ID in params and updated data in body)
+ * @param {Response} res - Express response object
+ * @returns {Promise<void>}
+ */
+
 export const updateCustomerController = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
@@ -53,7 +85,15 @@ export const updateCustomerController = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE
+/**
+ * Delete a customer
+ *
+ * @route DELETE /customers/:id
+ * @param {Request} req - Express request object (expects customer ID in params)
+ * @param {Response} res - Express response object
+ * @returns {Promise<void>}
+ */
+
 export const deleteCustomerController = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);

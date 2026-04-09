@@ -1,7 +1,13 @@
 import { pool } from "../config/db.js";
 import { CreateCustomerDTO, UpdateCustomerDTO } from "../services/customers/dto/customer.dto.js";
 
-// CREATE
+/**
+ * Create a new customer
+ *
+ * @param {CreateCustomerDTO} data - Customer data
+ * @returns {Promise<any>} Newly created customer record
+ */
+
 export const createCustomer = async (data: CreateCustomerDTO) => {
   const query = `
     INSERT INTO customers (name, contact, gender, age)
@@ -19,13 +25,24 @@ export const createCustomer = async (data: CreateCustomerDTO) => {
   return result.rows[0];
 };
 
-// GET ALL
+/**
+ * Fetch all customers
+ *
+ * @returns {Promise<any[]>} List of customers
+ */
+
 export const getCustomers = async () => {
   const result = await pool.query(`SELECT * FROM customers ORDER BY customer_id`);
   return result.rows;
 };
 
-// GET BY ID
+/**
+ * Fetch a customer by ID
+ *
+ * @param {number} id - Customer ID
+ * @returns {Promise<any>} Customer record
+ */
+
 export const getCustomerById = async (id: number) => {
   const result = await pool.query(
     `SELECT * FROM customers WHERE customer_id = $1`,
@@ -34,7 +51,16 @@ export const getCustomerById = async (id: number) => {
   return result.rows[0];
 };
 
-// UPDATE
+/**
+ * Update a customer (partial update supported)
+ *
+ * Dynamically updates only the provided fields.
+ *
+ * @param {number} customerId - Customer ID
+ * @param {UpdateCustomerDTO} data - Fields to update
+ * @returns {Promise<any>} Updated customer record
+ */
+
 export const updateCustomer = async (
   customerId: number,
   data: UpdateCustomerDTO
@@ -70,7 +96,13 @@ export const updateCustomer = async (
   return result.rows[0];
 };
 
-// DELETE
+/**
+ * Delete a customer
+ *
+ * @param {number} customerId - Customer ID
+ * @returns {Promise<any>} Deleted customer record
+ */
+
 export const deleteCustomer = async (customerId: number) => {
   const result = await pool.query(
     `DELETE FROM customers WHERE customer_id = $1 RETURNING *`,

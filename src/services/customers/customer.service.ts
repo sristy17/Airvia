@@ -14,7 +14,15 @@ import {
 
 import { trimString } from "../../core/utils/trim.js";
 
-// CREATE
+/**
+ * Create a new customer
+ *
+ * Validates input data and trims string fields before insertion.
+ *
+ * @param {CreateCustomerDTO} data - Customer input data
+ * @returns {Promise<Customer>} Newly created customer
+ */
+
 export const createCustomerService = async (
   data: CreateCustomerDTO
 ): Promise<Customer> => {
@@ -37,12 +45,23 @@ export const createCustomerService = async (
   });
 };
 
-// GET ALL
+/**
+ * Get all customers
+ *
+ * @returns {Promise<Customer[]>} List of customers
+ */
+
 export const getCustomersService = async (): Promise<Customer[]> => {
   return await getCustomers();
 };
 
-// GET BY ID
+/**
+ * Get a customer by ID
+ *
+ * @param {number} id - Customer ID
+ * @returns {Promise<Customer>} Customer record
+ */
+
 export const getCustomerByIdService = async (id: number): Promise<Customer> => {
   if (!id) throw new Error("Customer ID required");
 
@@ -53,7 +72,16 @@ export const getCustomerByIdService = async (id: number): Promise<Customer> => {
   return customer;
 };
 
-// UPDATE
+/**
+ * Update a customer (partial update supported)
+ *
+ * Trims string fields and validates input before updating.
+ *
+ * @param {number} customerId - Customer ID
+ * @param {UpdateCustomerDTO} data - Fields to update
+ * @returns {Promise<Customer>} Updated customer record
+ */
+
 export const updateCustomerService = async (
   customerId: number,
   data: UpdateCustomerDTO
@@ -75,7 +103,13 @@ export const updateCustomerService = async (
   return updated;
 };
 
-// DELETE
+/**
+ * Delete a customer
+ *
+ * @param {number} customerId - Customer ID
+ * @returns {Promise<Customer>} Deleted customer record
+ */
+
 export const deleteCustomerService = async (customerId: number): Promise<Customer> => {
   if (!customerId) throw new Error("Customer ID required");
 

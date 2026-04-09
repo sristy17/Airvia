@@ -7,7 +7,15 @@ import {
   getFlightByIdService,
 } from "../services/flights/flight.service.js";
 
-// CREATE
+/**
+ * Create a new flight
+ *
+ * @route POST /flights
+ * @param {Request} req - Express request object (expects flight data in body)
+ * @param {Response} res - Express response object
+ * @returns {Promise<void>}
+ */
+
 export const createFlightController = async (req: Request, res: Response) => {
   try {
     const flight = await createFlightService(req.body);
@@ -17,7 +25,15 @@ export const createFlightController = async (req: Request, res: Response) => {
   }
 };
 
-// GET ALL
+/**
+ * Get all flights
+ *
+ * @route GET /flights
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ * @returns {Promise<void>}
+ */
+
 export const getFlightsController = async (req: Request, res: Response) => {
   try {
     const flights = await getFlightsService();
@@ -27,7 +43,15 @@ export const getFlightsController = async (req: Request, res: Response) => {
   }
 };
 
-// GET BY ID
+/**
+ * Get a flight by ID
+ *
+ * @route GET /flights/:id
+ * @param {Request} req - Express request object (expects flight ID in params)
+ * @param {Response} res - Express response object
+ * @returns {Promise<void>}
+ */
+
 export const getFlightByIdController = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
@@ -38,7 +62,15 @@ export const getFlightByIdController = async (req: Request, res: Response) => {
   }
 };
 
-// UPDATE
+/**
+ * Update a flight
+ *
+ * @route PUT /flights/:id
+ * @param {Request} req - Express request object (expects flight ID in params and updated data in body)
+ * @param {Response} res - Express response object
+ * @returns {Promise<void>}
+ */
+
 export const updateFlightController = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
@@ -53,7 +85,15 @@ export const updateFlightController = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE
+/**
+ * Delete a flight
+ *
+ * @route DELETE /flights/:id
+ * @param {Request} req - Express request object (expects flight ID in params)
+ * @param {Response} res - Express response object
+ * @returns {Promise<void>}
+ */
+
 export const deleteFlightController = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);

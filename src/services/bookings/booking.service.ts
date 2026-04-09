@@ -11,7 +11,19 @@ import {
 import { CreateBookingDTO, Booking } from "./dto/booking.dto.js";
 import { addBookingJob } from "../../queue/booking.queue.js";
 
+/**
+ * Allowed booking status values
+ * @type {string[]}
+ */
+
 const VALID_STATUS = ["CONFIRMED", "CANCELLED", "PENDING"];
+
+/**
+ * Create a new booking
+ *
+ * @param {CreateBookingDTO} data - Booking input data
+ * @returns {Promise<{ message: string; booking: Booking }>}
+ */
 
 export const createBookingService = async (
   data: CreateBookingDTO
@@ -41,6 +53,13 @@ export const createBookingService = async (
   }
 };
 
+/**
+ * Approve a booking (async processing via queue)
+ *
+ * @param {number} bookingId - Booking ID
+ * @returns {Promise<{ message: string }>}
+ */
+
 export const approveBookingService = async (
   bookingId: number
 ): Promise<{ message: string }> => {
@@ -64,6 +83,13 @@ export const approveBookingService = async (
     message: "Booking sent for processing",
   };
 };
+
+/**
+ * Reject a booking
+ *
+ * @param {number} bookingId - Booking ID
+ * @returns {Promise<{ message: string }>}
+ */
 
 export const rejectBookingService = async (
   bookingId: number
@@ -89,9 +115,22 @@ export const rejectBookingService = async (
   };
 };
 
+/**
+ * Get all bookings
+ *
+ * @returns {Promise<Booking[]>}
+ */
+
 export const getBookingsService = async (): Promise<Booking[]> => {
   return await getBookings();
 };
+
+/**
+ * Get booking by ID
+ *
+ * @param {number} id - Booking ID
+ * @returns {Promise<Booking>}
+ */
 
 export const getBookingByIdService = async (id: number): Promise<Booking> => {
   if (!id || isNaN(id)) {
@@ -106,6 +145,14 @@ export const getBookingByIdService = async (id: number): Promise<Booking> => {
 
   return booking;
 };
+
+/**
+ * Update booking status
+ *
+ * @param {number} bookingId - Booking ID
+ * @param {string} status - New booking status
+ * @returns {Promise<Booking>}
+ */
 
 export const updateBookingStatusService = async (
   bookingId: number,
@@ -128,6 +175,13 @@ export const updateBookingStatusService = async (
   return booking;
 };
 
+/**
+ * Cancel a booking using transaction
+ *
+ * @param {number} bookingId - Booking ID
+ * @returns {Promise<{ message: string }>}
+ */
+
 export const cancelBookingService = async (
   bookingId: number
 ): Promise<{ message: string }> => {
@@ -148,6 +202,13 @@ export const cancelBookingService = async (
     client.release();
   }
 };
+
+/**
+ * Delete a booking
+ *
+ * @param {number} bookingId - Booking ID
+ * @returns {Promise<Booking>}
+ */
 
 export const deleteBookingService = async (
   bookingId: number
