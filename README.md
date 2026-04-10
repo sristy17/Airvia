@@ -1,3 +1,5 @@
+<img src="./airbnb.jpeg"/>
+
 # Airbnb Backend System
 
 This project is a backend system inspired by Airbnb, built using **Node.js**, **Express**, and **PostgreSQL**. It focuses on managing bookings, customers, and availability while ensuring strong database consistency and clean code organization.
