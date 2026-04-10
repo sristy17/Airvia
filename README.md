@@ -102,7 +102,7 @@ The system leverages PostgreSQL to ensure:
 ## Key Highlights
 
 - Backend system inspired by real-world booking platforms  
-- Clean architecture using MC + Service + Repository pattern  
+- Clean architecture using Model-Controller + Service + Repository pattern  
 - Integrated BullMQ + Redis queue system for async processing  
 - Implements producer–consumer pattern for scalability  
 - Strong focus on ACID-compliant database reliability  
