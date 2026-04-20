@@ -1,8 +1,8 @@
-<img src="./airbnb.jpeg"/>
+<img src="./airvia.jpeg"/>
 
-# Airbnb Backend System
+# Airvia Backend System
 
-This project is a backend system inspired by Airbnb, built using **Node.js**, **Express**, and **PostgreSQL**. It focuses on managing bookings, customers, and availability while ensuring strong database consistency and clean code organization.
+This project is a backend system inspired by modern booking platforms, built using **Node.js**, **Express**, and **PostgreSQL**. It focuses on managing bookings, customers, and availability while ensuring strong database consistency and clean code organization.
 
 The system simulates a real-world reservation workflow where users can create bookings, manage customers, and track availability. A key emphasis of the project is maintaining **data integrity and reliability** using PostgreSQL’s ACID-compliant transaction system.
 
